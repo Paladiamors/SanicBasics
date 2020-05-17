@@ -1,0 +1,80 @@
+#!/usr/bin/env python3
+
+import argparse
+
+import docker
+
+from settingsManager import settingsManager
+
+port = settingsManager.getSetting("REDIS/PORT")
+
+client = docker.from_env()
+name = "redis_test"
+ports = {"6379/tcp": port}
+image = "redis:latest"
+
+
+def start_container():
+    container = client.containers.list(all=True, filters={"name": name})
+    if container and container[0].status == "exited":
+        print("starting container")
+        container = container[0]
+        container.start()
+
+    elif not container:
+        print("running container")
+        client.containers.run(image, ports=ports, name=name, detach=True)
+    elif container and container[0].status == "running":
+        print("this container is still running")
+    else:
+        print("state of container is unknown")
+
+
+def stop_container():
+    container = client.containers.list(filters={"name": name})
+    if container:
+        print("stopping container")
+        container[0].stop()
+    else:
+        print("the container was not running")
+
+
+def clean_containers():
+    """
+    deletes all the containers
+    that are stopped
+    """
+
+    containers = client.containers.list(all=True, filters={"status": "exited"})
+    for container in containers:
+        print("cleaning container", container.name, container.image)
+        container.remove()
+
+
+def clean_container():
+    """
+    deletes a container by name
+    """
+
+    containers = client.containers.list(all=True, filters={"name": name})
+    if containers:
+        print("removing container")
+        containers[0].remove()
+    else:
+        print("no container to remove")
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="starts or stops a local redis container")
+    parser.add_argument("action", help="action is one of start|stop|clean")
+
+    args = parser.parse_args()
+    actions = ("start", "stop", "clean")
+    if args.action == "start":
+        start_container()
+    elif args.action == "stop":
+        stop_container()
+    elif args.action == "clean":
+        clean_container()
+    else:
+        print("the action needs to be in one of", actions)

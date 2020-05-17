@@ -1,0 +1,20 @@
+{
+  "settings": {
+    "REDIS": {
+      "HOST": "localhost",
+      "PORT": 6379,
+      "POOLSIZE": 10
+    },
+    "REDIS_SESSION": {
+      "cookie_name": "session",
+      "samesite": "strict",
+      "session_name": "session"
+    },
+    "ENV": "local",
+    "TESTING": true,
+    "HOST": "0.0.0.0",
+    "PORT": "4000",
+    "SECRET_KEY": "adfkjaskfhahf38",
+    "CSRF_SECRET": "zurkCb5oFexzZmOKdDVHJ3rAMbN1PJnvjsOhI_r14GQ="
+  }
+}
