@@ -58,10 +58,12 @@ def clean_container():
 
 
 if __name__ == '__main__':
+    
+    # TODO: Add an argparser here
     #     start_container()
     #     clean_containers()
 
     #     stop_container()
-#     start_container()
+    start_container()
 #     stop_container()
-    clean_container()
+#     clean_container()
