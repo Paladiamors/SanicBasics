@@ -1,0 +1,12 @@
+{
+	"REDIS": {
+		"HOST": "localhost",
+		"PORT": 6379,
+		"POOLSIZE": 10
+	},
+	"REDIS_SESSION": {
+		"cookie_name": "test_app_session",
+		"samesite": "strict",
+		"session_name": "session"
+	}
+}
