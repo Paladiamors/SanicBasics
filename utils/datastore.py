@@ -9,12 +9,12 @@ between the request and session
 request has the session data
 response has the cookie data
 '''
-from sanic_config import get_configs
+from settingsManager import settingsManager
 from utils.redis import redis
 import uuid
 import ujson
 
-configs = get_configs()
+configs = settingsManager.settings
 
 
 class RedisStore:

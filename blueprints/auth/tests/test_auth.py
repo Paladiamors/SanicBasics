@@ -3,14 +3,14 @@ Created on May 17, 2020
 
 @author: justin
 '''
+import os
+import time
 import unittest
 
 from requests import Session
 
 from db.base import memorySession
 from utils.testing import runSanicProcess
-import os
-import time
 
 proc, port = runSanicProcess()
 time.sleep(0.5)
@@ -29,7 +29,7 @@ class Test(unittest.TestCase):
     def testCreateUser(self):
 
         session = Session()
-        json = {"username": ["test", "test2"]}
+        json = {"username": ["test"]}
         session.post(os.path.join(baseUrl, "api/auth/createUser"), data=json)
         session.close()
 

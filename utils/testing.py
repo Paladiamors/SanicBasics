@@ -5,17 +5,18 @@ Created on May 17, 2020
 '''
 
 import os
-from sanic_config import base_path
+from settingsManager import settingsManager
 from subprocess import Popen
 from utils.networking import get_port
 import requests
 import time
 
+basePath = settingsManager.basePath
 
 def runSanicProcess():
     
-    pythonExec = os.path.join(base_path, "pybin/bin/python3")
-    runCommand = os.path.join(base_path, "runserver.py")
+    pythonExec = os.path.join(basePath, "pybin/bin/python3")
+    runCommand = os.path.join(basePath, "runserver.py")
     port = str(get_port())
 
     proc = Popen([pythonExec, runCommand, "--port", port])

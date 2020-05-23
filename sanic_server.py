@@ -11,10 +11,8 @@ from sanic_session import Session, RedisSessionInterface
 
 from blueprints.core.views import bp as core
 from blueprints.auth.views import bp as auth
-from sanic_config import get_configs
+from settingsManager import settingsManager
 from utils.redis import redis
-from utils.networking import get_port
-from subprocess import Popen
 
 
 blueprints = [
@@ -22,7 +20,7 @@ blueprints = [
     auth
 ]
 
-config = get_configs()
+config = settingsManager.settings
 
 
 def create_app():
@@ -35,6 +33,7 @@ def create_app():
 
     app.config.update(config)
     return app
+
 
 if __name__ == "__main__":
     app = create_app()

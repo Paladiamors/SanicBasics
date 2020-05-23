@@ -9,10 +9,10 @@ import uuid
 import asyncio_redis
 import ujson
 
-from sanic_config import get_configs
+from settingsManager import settingsManager
 
 
-configs = get_configs()
+configs = settingsManager.settings
 
 
 class Redis:

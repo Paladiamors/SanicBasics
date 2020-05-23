@@ -9,7 +9,7 @@ def parseForm(request):
     """
     naive form parser
     """
-
+    # TODO: escape the dangerous characters.
     if not request.form:
         return {}
 
@@ -49,6 +49,7 @@ class Form:
         returns the errors
         """
         return self._errors
+
     def _parseFields(self, data):
         """
         data is a dictionary

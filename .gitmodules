@@ -1,0 +1,3 @@
+[submodule "settingsManager"]
+	path = settingsManager
+	url = git@github.com:Paladiamors/settingsManager.git
