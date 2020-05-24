@@ -3,22 +3,16 @@ Created on May 17, 2020
 
 @author: justin
 '''
-
-import copy
-import datetime
-from random import randint
-import time
-
 from sqlalchemy import create_engine, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.orm import sessionmaker
 
-# connDict = {"main": "postgresql+psycopg2://service:service@paladiamors.com/Stocks",
-#             "test": "postgresql+psycopg2://service:service@paladiamors.com/Stocks_test"}
+from settingsManager import settingsManager
 
 connDict = {"main": "postgresql+psycopg2://service:service@paladiamors.com/SanicApp",
-            "memory": "sqlite://"}
+            "memory": "sqlite://",
+            "local":  f"sqlite:///{settingsManager.basePath}/local.db"}
 
 Base = declarative_base()
 
@@ -64,13 +58,21 @@ class SessionManager:
         self.createTables(env)
         return self.getSession(env)
 
-
 sessionManager = SessionManager()
 
 
-def getSession(env):
-    return sessionManager.getSession(env)
+def getSession(env, session=None):
+    """
+    env = environment to make the dconnection
+    or use some session already provided
+    """
+    return session or sessionManager.getSession(env)
 
 
 def memorySession():
     return sessionManager.memorySession()
+
+
+if __name__ == "__main__":
+    
+    sessionManager.createTables("local")

@@ -5,7 +5,6 @@
 ##################################################
 
 
-import os
 from sanic import Sanic
 from sanic_session import Session, RedisSessionInterface
 
@@ -20,10 +19,12 @@ blueprints = [
     auth
 ]
 
+
 config = settingsManager.settings
+reload = settingsManager.getSetting("TESTING")
 
 
-def create_app():
+def createApp():
     app = Sanic(name="main")
 
     # setup sanic session
@@ -35,6 +36,16 @@ def create_app():
     return app
 
 
+def runServer(host=None, port=None, settings=None):
+
+    if settings:
+        settingsManager.loadSettings(settings)
+    host = host or settingsManager.getSetting("HOST")
+    port = port or settingsManager.getSetting("PORT")
+    app = createApp()
+    app.run(host=host, port=port, auto_reload=reload)
+
+
 if __name__ == "__main__":
-    app = create_app()
-    app.run(host="0.0.0.0", port=8081, auto_reload=True)
+
+    runServer()

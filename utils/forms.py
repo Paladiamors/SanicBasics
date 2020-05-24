@@ -10,6 +10,9 @@ def parseForm(request):
     naive form parser
     """
     # TODO: escape the dangerous characters.
+    # note that form data comes via the data component
+    # instead of json (json comes in via the body of the post)
+    # need to figure out how to csrf tokens later
     if not request.form:
         return {}
 

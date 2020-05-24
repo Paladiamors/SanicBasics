@@ -6,6 +6,7 @@ from sanic.request import Request
 app = Sanic()
 session = Session(app, interface=InMemorySessionInterface())
 
+
 @app.route("/")
 async def index(request):
     # interact with the session like a normal dict

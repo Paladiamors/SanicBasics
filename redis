@@ -4,9 +4,9 @@ import argparse
 
 import docker
 
-from sanic_config import get_configs
+from settingsManager import settingsManager
 
-port = get_configs()["REDIS"]["PORT"]
+port = settingsManager.getSetting("REDIS/PORT")
 
 client = docker.from_env()
 name = "redis_test"

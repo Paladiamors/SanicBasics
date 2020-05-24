@@ -7,7 +7,14 @@ bp = Blueprint("core", url_prefix="api/core/")
 
 @bp.route("users")
 async def users(request):
-    return json({"users": ["user1", "user2", "user3", "user4"]})
+    print(request.ctx.session)
+    print(request.ctx.session["session"])
+    print(dir(request.ctx.session["session"]))
+    print(request.ctx.session["session"].sid)
+    print(request.cookies)
+    response = json({"users": ["user1", "user2", "user3", "user4"]})
+    response.cookies["hello"] = "world"
+    return response
 
 
 @bp.route("users2")

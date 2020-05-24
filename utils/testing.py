@@ -11,6 +11,8 @@ from utils.networking import get_port
 import requests
 import time
 
+settings = "settings_test.json"
+settingsManager.loadSettings(settings)
 basePath = settingsManager.basePath
 
 def runSanicProcess():
@@ -19,9 +21,12 @@ def runSanicProcess():
     runCommand = os.path.join(basePath, "runserver.py")
     port = str(get_port())
 
-    proc = Popen([pythonExec, runCommand, "--port", port])
+    proc = Popen([pythonExec, runCommand, "--port", port, "--settings", settings])
     return proc, port
 
+def deleteLocalDb():
+    
+    dbPath = 
 
 if __name__ == '__main__':
     

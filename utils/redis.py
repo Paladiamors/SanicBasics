@@ -35,9 +35,14 @@ class Redis:
 
 
 class RedisStore:
+    """
+    Provides a more flexible method
+    of storing data related to a user in redis
+    the data can be keyed by the session id
+    """
 
-    cookie_name = configs["REDIS_SESSION"]["cookie_name"]
-    session_name = configs["REDIS_SESSION"]["session_name"]
+    cookieName = configs["REDIS_SESSION"]["cookie_name"]
+    sessionName = configs["REDIS_SESSION"]["session_name"]
 
     def __init__(self, request):
         """
@@ -48,7 +53,7 @@ class RedisStore:
         self.request = request
         self.connections = {}
 
-    async def redis_write(self, key, value, expiry=-1, db=0):
+    async def redisWrite(self, key, value, expiry=-1, db=0):
         """
         writes a value into the redis cache
         """
@@ -57,7 +62,7 @@ class RedisStore:
         value = ujson.dumps(value)
         await connection.setex(key, expiry, value)
 
-    async def redis_read(self, key, db=0):
+    async def redisRead(self, key, db=0):
         """
         reads a value from the redis cache
         """
@@ -65,7 +70,7 @@ class RedisStore:
         connection = await redis.get_redis_pool(db)
         return ujson.loads(await connection.get(key))
 
-    async def redis_delete(self, key, db=0):
+    async def redisDelete(self, key, db=0):
         """
         deletes a value from the redis cache
         """
@@ -79,34 +84,34 @@ class RedisStore:
         """
 
         token = uuid.uuid4().hex
-        key = f"CSRF:{self.session_id}:{token}"
-        await self.redis_write(key, True, 1800)
+        key = f"CSRF:{self.sessionId}:{token}"
+        await self.redisWrite(key, True, 1800)
         return token
 
     async def csrf_ok(self, token):
         """
         validates the token
         """
-        key = f"CSRF:{self.session_id}:{token}"
-        result = await self.redis_write(key, True, 1800)
+        key = f"CSRF:{self.sessionId}:{token}"
+        result = await self.redisWrite(key, True, 1800)
         return True if result else False
 
     @property
-    def session_id(self):
-        return self.request[self.session_name][self.cookie_name]
+    def sessionId(self):
+        return self.request.ctx.session[self.sessionName].sid
 
     @property
     def session(self):
         "returns the redis session"
-        return self.request[self.session_name]
+        return self.request.ctx.session[self.sessionName]
 
     @property
     def cookies(self):
         return self.request.cookies
 
-    def set_cookie(self, key, value, maxage=None, expires=None, httponly=None,
-                   samesite=None, domain=None, secure=None,
-                   comment=None):
+    def setCookie(self, key, value, maxage=None, expires=None, httponly=None,
+                  samesite=None, domain=None, secure=None,
+                  comment=None):
         """
         information based on https://sanic.readthedocs.io/en/latest/sanic/cookies.html
 

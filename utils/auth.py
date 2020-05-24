@@ -5,40 +5,52 @@ Created on May 17, 2020
 
 tools for authentication
 '''
-from utils.redis import RedisStore
 from sanic.response import json
+from sqlalchemy.sql import or_
+
+from db.appTables import User
+from db.base import getSession
+from db.utils import bulkInsert
+from settingsManager import settingsManager
+from utils.redis import RedisStore
 
 
-def authenticate(login, password, redisStore):
-    """
-    simple authentication mechanism
-    """
-    redisStore.session["authenticated"] = True
-    
-    return True
+env = settingsManager.getSetting("ENV")
 
-def is_authenticated(f):
+
+def checkCredentials(username, password, redisStore, dSession=None):
     """
-    decorator for authentication
-    decorates a view
+    if the authentication info is ok
+    then sets the authentication to authenticated
+
     """
-    
-    def func(request):
-        
-        dataStore = RedisStore(request)
-        if dataStore.session.get("authenticated"):
-            return f(request)
-        else:
-            return json({"ok": False, "msg": "please authenticate"})
-    
-    return func
+
+    dSession = getSession(env, dSession)
+    user = dSession.query(User).filter(User.username == username)
+    if user and user.password == password or redisStore.session["authenticated"]:
+        return True
+    else:
+        return False
+
+
+def login(request, response):
+    """
+    request = to set the value in the cookie
+    response = the response object to set the cookie
+    sets the state in redis that the user
+    is logged in
+    """
+
+    response.cookies["authenticated"] = True
+    request.ctx.session["session"]
+
 
 def logout(request):
     """
     performs a logout on the request
     """
-    
-    dataStore =  RedisStore(request)
+
+    dataStore = RedisStore(request)
     if dataStore.session.get("authenticated"):
         response = json({"ok": True})
         del dataStore.session["authenticated"]
@@ -47,9 +59,48 @@ def logout(request):
     else:
         return json({"ok": False, "msg": "not logged in"})
 
-def create_user(request, method=["GET", "POST"]):
+
+def isAuthenticated(f):
+    """
+    decorator for authentication
+    decorates a view
+    """
+
+    def func(request):
+
+        dataStore = RedisStore(request)
+        if dataStore.session.get("authenticated"):
+            return f(request)
+        else:
+            return json({"ok": False, "msg": "please authenticate"})
+
+    return func
+
+
+def createUser(data, dSession=None):
     """
     creates a user
     """
-    
-    
+    dSession = getSession(env, dSession)
+    bulkInsert(dSession, User, [data])
+
+
+def deleteUser(info, dSession=None):
+    """
+    deletes a user
+    """
+    dSession = getSession(env, dSession)
+    query = User.__table__.delete().where(or_(User.username == info,
+                                              User.email == info))
+    dSession.execute(query)
+    dSession.commit()
+
+
+def userExists(info, dSession=None):
+
+    dSession = getSession(env, dSession)
+    uid = dSession.query(User.id).filter(or_(User.username == info,
+                                             User.email == info)).\
+        scalar()
+
+    return True if uid else False
