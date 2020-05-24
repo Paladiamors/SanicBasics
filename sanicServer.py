@@ -19,31 +19,29 @@ blueprints = [
     auth
 ]
 
-
-config = settingsManager.settings
-reload = settingsManager.getSetting("TESTING")
-
-
 def createApp():
+
     app = Sanic(name="main")
+    config = settingsManager.getSetting("REDIS_SESSION")
 
     # setup sanic session
-    Session(app, interface=RedisSessionInterface(redis.get_redis_pool_func(), **config["REDIS_SESSION"]))
+    Session(app, interface=RedisSessionInterface(redis.get_redis_pool_func(), **config))
 
     [app.blueprint(bp) for bp in blueprints]
 
-    app.config.update(config)
+    app.config.update(settingsManager.settings)
     return app
 
 
-def runServer(host=None, port=None, settings=None):
+def runServer(host=None, port=None, settings=None, auto_reload=None):
 
     if settings:
         settingsManager.loadSettings(settings)
+    auto_reload = auto_reload if auto_reload is not None else settingsManager.getSetting("TESTING", False)
     host = host or settingsManager.getSetting("HOST")
     port = port or settingsManager.getSetting("PORT")
     app = createApp()
-    app.run(host=host, port=port, auto_reload=reload)
+    app.run(host=host, port=port, auto_reload=auto_reload)
 
 
 if __name__ == "__main__":

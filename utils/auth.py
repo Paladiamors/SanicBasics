@@ -15,9 +15,6 @@ from settingsManager import settingsManager
 from utils.redis import RedisStore
 
 
-env = settingsManager.getSetting("ENV")
-
-
 def checkCredentials(username, password, redisStore, dSession=None):
     """
     if the authentication info is ok
@@ -25,7 +22,7 @@ def checkCredentials(username, password, redisStore, dSession=None):
 
     """
 
-    dSession = getSession(env, dSession)
+    dSession = dSession or getSession()
     user = dSession.query(User).filter(User.username == username)
     if user and user.password == password or redisStore.session["authenticated"]:
         return True
@@ -81,7 +78,7 @@ def createUser(data, dSession=None):
     """
     creates a user
     """
-    dSession = getSession(env, dSession)
+    dSession = getSession(session=dSession)
     bulkInsert(dSession, User, [data])
 
 
@@ -89,7 +86,7 @@ def deleteUser(info, dSession=None):
     """
     deletes a user
     """
-    dSession = getSession(env, dSession)
+    dSession = getSession(session=dSession)
     query = User.__table__.delete().where(or_(User.username == info,
                                               User.email == info))
     dSession.execute(query)
@@ -98,7 +95,7 @@ def deleteUser(info, dSession=None):
 
 def userExists(info, dSession=None):
 
-    dSession = getSession(env, dSession)
+    dSession = getSession(session=dSession)
     uid = dSession.query(User.id).filter(or_(User.username == info,
                                              User.email == info)).\
         scalar()

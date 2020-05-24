@@ -61,11 +61,13 @@ class SessionManager:
 sessionManager = SessionManager()
 
 
-def getSession(env, session=None):
+def getSession(env=None, session=None):
     """
     env = environment to make the dconnection
     or use some session already provided
     """
+    env = env or settingsManager.getSetting("ENV")
+    print("env is", env)
     return session or sessionManager.getSession(env)
 
 

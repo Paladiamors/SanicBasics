@@ -13,8 +13,8 @@ from settingsManager import settingsManager
 from db.base import getSession
 from db.appTables import User
 from sqlalchemy.sql import or_
+from utils.auth import createUser as createUser_
 
-env = settingsManager.getSetting("ENV")
 bp = Blueprint("auth", url_prefix="api/auth/")
 
 
@@ -24,12 +24,15 @@ async def createUser(request):
     if request.method == "POST":
 
         result = {}
+        
+        # TODO: parseForm component does not work
+        # for booleans, probably need to do something about this
         data = parseForm(request)
-        dSession = getSession(env)
+        dSession = getSession()
 
-        unameResult = dSession(User.id).filter(User.username == data["username"])
-        emailResult = dSession(User.id).filter(User.email == data["email"])
-
+        # Make this faster later
+        unameResult = dSession.query(User.id).filter(User.username == data["username"]).scalar()
+        emailResult = dSession.query(User.id).filter(User.email == data["email"]).scalar()
         errors = []
         if unameResult:
             errors.append({"msg": "This user already exists"})
@@ -40,7 +43,7 @@ async def createUser(request):
             result["errors"] = errors
             result["ok"] = False
         else:
-
+            createUser_(data, dSession)
             result["ok"] = True
 
         return json(result)

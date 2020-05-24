@@ -9,8 +9,14 @@ import unittest
 
 from requests import Session
 
-from db.base import memorySession
+from db import getSession
+from settingsManager import settingsManager
+from utils.auth import deleteUser, userExists
 from utils.testing import runSanicProcess
+
+
+# testing settings
+settingsManager.loadSettings("settings_test.json")
 
 proc, port = runSanicProcess()
 time.sleep(0.5)
@@ -20,18 +26,23 @@ baseUrl = f"http://localhost:{port}"
 
 class Test(unittest.TestCase):
 
-    def setUp(self):
-        self.session = memorySession()
-
-    def tearDown(self):
-        pass
-
     def testCreateUser(self):
 
         session = Session()
-        json = {"username": ["test"]}
-        session.post(os.path.join(baseUrl, "api/auth/createUser"), data=json)
-        session.close()
+        dSession = getSession()
+        username = "testUser"
+        password = "12345"
+        userData = {"username": username, "password": password,
+                    "email": "email@test.com", "isStaff": True,
+                    "isActive": True, "verified": True}
+
+        print("deleting user")
+        deleteUser(username, dSession=dSession)
+        print("making post")
+        result = session.post(os.path.join(baseUrl, "api/auth/createUser"), data=userData)
+        print(result.json())
+        self.assertTrue(userExists(username, dSession), "user exist")
+        dSession.close()
 
     @unittest.skip("not testing")
     def testAuth(self):
