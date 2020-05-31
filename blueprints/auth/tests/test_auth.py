@@ -36,11 +36,11 @@ class Test(unittest.TestCase):
                     "email": "email@test.com", "isStaff": True,
                     "isActive": True, "verified": True}
 
-        print("deleting user")
-        deleteUser(username, dSession=dSession)
-        print("making post")
-        result = session.post(os.path.join(baseUrl, "api/auth/createUser"), data=userData)
-        print(result.json())
+        deleteUser(username)
+        response = session.get(os.path.join(baseUrl, "api/auth/createUser"))
+        userData.update(response.json())
+        print(userData)
+        session.post(os.path.join(baseUrl, "api/auth/createUser"), data=userData)
         self.assertTrue(userExists(username, dSession), "user exist")
         dSession.close()
 

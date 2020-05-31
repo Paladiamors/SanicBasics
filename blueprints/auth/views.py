@@ -14,6 +14,7 @@ from db.base import getSession
 from db.appTables import User
 from sqlalchemy.sql import or_
 from utils.auth import createUser as createUser_
+from blueprints.auth.forms import UserForm
 
 bp = Blueprint("auth", url_prefix="api/auth/")
 
@@ -27,12 +28,17 @@ async def createUser(request):
         
         # TODO: parseForm component does not work
         # for booleans, probably need to do something about this
-        data = parseForm(request)
+#         data = parseForm(request)
+        form = UserForm(request)
+        print("validate form", form.validate())
+        print("errors", form.errors)
+        print("form", dir("form"))
+        
         dSession = getSession()
 
         # Make this faster later
-        unameResult = dSession.query(User.id).filter(User.username == data["username"]).scalar()
-        emailResult = dSession.query(User.id).filter(User.email == data["email"]).scalar()
+        unameResult = dSession.query(User.id).filter(User.username == form.data["username"]).scalar()
+        emailResult = dSession.query(User.id).filter(User.email == form.data["email"]).scalar()
         errors = []
         if unameResult:
             errors.append({"msg": "This user already exists"})
@@ -43,13 +49,16 @@ async def createUser(request):
             result["errors"] = errors
             result["ok"] = False
         else:
-            createUser_(data, dSession)
+            createUser_(form.data, dSession)
             result["ok"] = True
 
         return json(result)
 
     else:
-        return json({"errors:": [{"msg": "Please post the appropriate data"}]})
+        form = UserForm(request)
+        return json({"csrf_token": form.csrf_token._value()})
+#         return json({"csrf_token:": form._csrf.session["csrf"]})
+    
 
 
 @bp.route("login")
