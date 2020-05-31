@@ -9,20 +9,18 @@
 
 from sanic_wtf import SanicForm
 from db.appTables import User
-from wtforms_sqlalchemy.orm import model_form, ModelConverter, converts
-from wtforms import fields as f
-
-
-class Converter(ModelConverter):
-    
-    @converts('String', 'Unicode', 'PasswordType', 'EmailType')
-    def conv_String(self, field_args, **extra):
-        self._string_common(field_args=field_args, **extra)
-        return f.TextField(**field_args)
+from wtforms_sqlalchemy.orm import model_form
+from utils.forms import Converter
+from wtforms import TextField, PasswordField
+from wtforms.validators import DataRequired
     
 class UserForm(SanicForm, model_form(User,converter=Converter())):
     pass
 
+class LoginForm(SanicForm):
+    ident = TextField("username_or_email", validators=[DataRequired()])
+    password = PasswordField("password", validators=[DataRequired()])
+    
 if __name__ == "__main__":
     
     userForm = UserForm()

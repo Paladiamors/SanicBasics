@@ -11,23 +11,23 @@ from sqlalchemy.sql import or_
 from db.appTables import User
 from db.base import getSession
 from db.utils import bulkInsert
-from settingsManager import settingsManager
 from utils.redis import RedisStore
 
 
-def checkCredentials(username, password, redisStore, dSession=None):
+def checkCredentials(username, password, dSession=None):
     """
     if the authentication info is ok
     then sets the authentication to authenticated
-
+    returns the user.id if the authentication request
+    was ok
     """
 
     dSession = dSession or getSession()
-    user = dSession.query(User).filter(User.username == username)
-    if user and user.password == password or redisStore.session["authenticated"]:
-        return True
+    user = dSession.query(User).filter(User.username == username).one_or_none()
+    if user and user.password == password:
+        return user.id
     else:
-        return False
+        return None
 
 
 def login(request, response):

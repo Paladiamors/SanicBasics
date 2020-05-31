@@ -10,25 +10,19 @@ import unittest
 from requests import Session
 
 from db import getSession
-from settingsManager import settingsManager
 from utils.auth import deleteUser, userExists
-from utils.testing import runSanicProcess
+from utils.testing import SanicRequests
 
 
-# testing settings
-settingsManager.loadSettings("settings_test.json")
-
-proc, port = runSanicProcess()
-time.sleep(0.5)
-
-baseUrl = f"http://localhost:{port}"
+sanicRequests = SanicRequests()
 
 
 class Test(unittest.TestCase):
 
+    @unittest.skip("works")
     def testCreateUser(self):
 
-        session = Session()
+        sanicRequests.newSession()
         dSession = getSession()
         username = "testUser"
         password = "12345"
@@ -37,24 +31,38 @@ class Test(unittest.TestCase):
                     "isActive": True, "verified": True}
 
         deleteUser(username)
-        response = session.get(os.path.join(baseUrl, "api/auth/createUser"))
+        response = sanicRequests.get("api/auth/createUser")
         userData.update(response.json())
         print(userData)
-        session.post(os.path.join(baseUrl, "api/auth/createUser"), data=userData)
-        self.assertTrue(userExists(username, dSession), "user exist")
+        sanicRequests.post("api/auth/createUser", data=userData)
+        self.assertTrue(userExists(username, dSession), "user should exist")
         dSession.close()
 
-    @unittest.skip("not testing")
+#     @unittest.skip("not testing")
     def testAuth(self):
 
-        session = Session()
-        response = session.get(os.path.join(baseUrl, "api/auth/login"))
-        print(response)
-        session.close()
+        sanicRequests.newSession()
+        dSession = getSession()
+        username = "testUser"
+        password = "12345"
+        userData = {"username": username, "password": password,
+                    "email": "email@test.com", "isStaff": True,
+                    "isActive": True, "verified": True}
+
+        deleteUser(username, dSession=dSession)
+        token = sanicRequests.get("api/forms/token").json()
+        userData.update(token)
+        sanicRequests.post("api/auth/createUser", data=userData)
+
+        login = {"ident": "testUser", "password": "12345"}
+        login.update(token)
+        response = sanicRequests.post("api/auth/login", data=login)
+        print("logged in", response.cookies.get("authenticated"))
+        print("response", response.json())
 
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
+
     unittest.main(exit=False)
-    print("after unittest")
-    proc.kill()
+    sanicRequests.kill()

@@ -10,13 +10,15 @@ from sanic_session import Session, RedisSessionInterface
 
 from blueprints.core.views import bp as core
 from blueprints.auth.views import bp as auth
+from blueprints.forms.views import bp as forms
 from settingsManager import settingsManager
 from utils.redis import redis
 
 
 blueprints = [
     core,
-    auth
+    auth,
+    forms
 ]
 
 def createApp():
@@ -37,7 +39,7 @@ def runServer(host=None, port=None, settings=None, auto_reload=None):
 
     if settings:
         settingsManager.loadSettings(settings)
-    auto_reload = auto_reload if auto_reload is not None else settingsManager.getSetting("TESTING", False)
+    auto_reload = auto_reload if auto_reload is not None else settingsManager.getSetting("TESTING")
     host = host or settingsManager.getSetting("HOST")
     port = port or settingsManager.getSetting("PORT")
     app = createApp()

@@ -19,9 +19,9 @@ class User(Base):
     password = Column(PasswordType(schemes=["pbkdf2_sha512"]), nullable=False)
     username = Column(String(150), nullable=False, unique=True)
     email = Column(EmailType, nullable=False, unique=True)
-    isStaff = Column(Boolean, nullable=False)
-    isActive = Column(Boolean, nullable=False)
-    dateJoined = Column(DateTime(True), nullable=False, default=datetime.datetime.now)
+    isStaff = Column(Boolean, default=False)
+    isActive = Column(Boolean, default=True)
+    dateJoined = Column(DateTime(True), default=datetime.datetime.now)
     verified = Column(Boolean, default=False)
     
     ix_username_email = Index("ix_username_email", username, email)

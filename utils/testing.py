@@ -10,6 +10,7 @@ from subprocess import Popen
 from utils.networking import get_port
 import requests
 import time
+from urllib.parse import urljoin
 
 settings = "settings_test.json"
 settingsManager.loadSettings(settings)
@@ -24,6 +25,53 @@ def runSanicProcess():
 
     proc = Popen([pythonExec, runCommand, "--port", port, "--settings", settings])
     return proc, port
+
+
+class SanicRequests:
+
+    def __init__(self, session=None, wait=0.5, settings="settings_test.json"):
+        """
+        launchers a server at local host for testing
+        session: is a requests session
+        wait: time in seconds to wait after kicking off the sanic process
+        settings: the name of the settings file to load
+        """
+        
+        settingsManager.loadSettings(settings)
+        basePath = settingsManager.basePath
+
+        self.session = session or requests.Session()
+        pythonExec = os.path.join(basePath, "pybin/bin/python3")
+        runCommand = os.path.join(basePath, "runserver.py")
+        self.port = str(get_port())
+        self.proc = Popen([pythonExec, runCommand, "--port", self.port, "--settings", settings])
+        self.baseUrl = f"http://localhost:{self.port}"
+        time.sleep(wait)  # give the server some time to start up
+
+    def localLink(self, url):
+        return urljoin(self.baseUrl, url)
+
+    def get(self, url, **kwargs):
+        return self.session.get(self.localLink(url), **kwargs)
+
+    def put(self, url, **kwargs):
+        return self.session.put(self.localLink(url), **kwargs)
+
+    def post(self, url, **kwargs):
+        return self.session.post(self.localLink(url), **kwargs)
+
+    def delete(self, url, **kwargs):
+        return self.session.delete(self.localLink(url), **kwargs)
+
+    def kill(self):
+        """
+        stops the sanic server
+        """
+        self.proc.kill()
+        
+    def newSession(self):
+        
+        self.session = requests.Session()
 
 
 if __name__ == '__main__':

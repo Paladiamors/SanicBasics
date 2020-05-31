@@ -8,13 +8,10 @@ from sanic.response import json
 
 from utils.auth import checkCredentials, logout as logout_, isAuthenticated
 from utils.redis import RedisStore
-from utils.forms import parseForm
-from settingsManager import settingsManager
 from db.base import getSession
 from db.appTables import User
-from sqlalchemy.sql import or_
 from utils.auth import createUser as createUser_
-from blueprints.auth.forms import UserForm
+from blueprints.auth.forms import UserForm, LoginForm
 
 bp = Blueprint("auth", url_prefix="api/auth/")
 
@@ -25,14 +22,10 @@ async def createUser(request):
     if request.method == "POST":
 
         result = {}
-        
-        # TODO: parseForm component does not work
-        # for booleans, probably need to do something about this
-#         data = parseForm(request)
         form = UserForm(request)
-        print("validate form", form.validate())
-        print("errors", form.errors)
-        print("form", dir("form"))
+#         print("validate form", form.validate())
+#         print("errors", form.errors)
+#         print("form", dir("form"))
         
         dSession = getSession()
 
@@ -61,24 +54,37 @@ async def createUser(request):
     
 
 
-@bp.route("login")
+@bp.route("login", methods=["GET", "POST"])
 async def login(request):
     """
     logs a user in
     """
-    dataStore = RedisStore(request)
-
-    # here we check the backend to see that the user is authenticated
-    # writing the state in the user cookie is just a courtesy
-    if dataStore.session.get("authenticated"):
-        return json({"ok": False, "msg": "please log out before logging in"})
-    elif checkCredentials("", "", dataStore):
-        response = json({"ok": True})
-        response.cookies["authenticated"] = "True"
-        response.cookies["authenticated"]["samesite"] = "Strict"
-        return response
+    
+    if request.method == "POST":
+        dataStore = RedisStore(request)
+        
+        form = LoginForm(request)
+        if not form.validate():
+            return json({"ok": False, "errors": form.errors})
+        
+        ident = form.data["ident"]
+        password = form.data["password"]
+        username = checkCredentials(ident, password)
+        # here we check the backend to see that the user is authenticated
+        # writing the state in the user cookie is just a courtesy
+        if dataStore.session.get("authenticated"):
+            return json({"ok": False, "msg": "please log out before logging in"})
+        
+        elif username:
+            response = json({"ok": True})
+            response.cookies["authenticated"] = "true"
+            response.cookies["authenticated"]["samesite"] = "Strict"
+            request.ctx.session["username"] = username
+            return response
+        else:
+            return json({"ok": False, "msg": "login or password incorrect"})
     else:
-        return json({"ok": False, "msg": "login or password incorrect"})
+        return json({"ok": False, "msg": "please post the appropriate data"})
 
 
 @bp.route("logout")

@@ -98,12 +98,12 @@ class RedisStore:
 
     @property
     def sessionId(self):
-        return self.request.ctx.session[self.sessionName].sid
+        return self.request.ctx.session.sid
 
     @property
     def session(self):
         "returns the redis session"
-        return self.request.ctx.session[self.sessionName]
+        return self.request.ctx.session
 
     @property
     def cookies(self):

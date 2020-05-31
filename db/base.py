@@ -67,7 +67,7 @@ def getSession(env=None, session=None):
     or use some session already provided
     """
     env = env or settingsManager.getSetting("ENV")
-    print("env is", env)
+#     print("env is", env)
     return session or sessionManager.getSession(env)
 
 
