@@ -10,9 +10,10 @@
 			"samesite": "strict",
 			"session_name": "session"
 		},
-		"ENV": "main",
+		"ENV": "local",
 		"TESTING": true,
 		"HOST": "0.0.0.0",
-		"PORT": "8081"
+		"PORT": "8000",
+		"SECRET_KEY": "adfkjaskfhahf38"
 	}
 }

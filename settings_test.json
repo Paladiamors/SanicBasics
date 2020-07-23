@@ -13,6 +13,7 @@
 		"ENV": "local",
 		"TESTING": true,
 		"HOST": "0.0.0.0",
-		"PORT": "8081"
+		"PORT": "8081",
+		"SECRET_KEY": "adfkjaskfhahf38"
 	}
 }

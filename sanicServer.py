@@ -21,6 +21,7 @@ blueprints = [
     forms
 ]
 
+
 def createApp():
 
     app = Sanic(name="main")
@@ -49,3 +50,4 @@ def runServer(host=None, port=None, settings=None, auto_reload=None):
 if __name__ == "__main__":
 
     runServer()
+    print("at the end")
