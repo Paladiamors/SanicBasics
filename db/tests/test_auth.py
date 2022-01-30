@@ -3,7 +3,7 @@ import unittest
 from db.auth import User
 from db.base import get_async_session, session_manager
 
-env = "memory"
+env = "test"
 
 
 class Test(unittest.TestCase):

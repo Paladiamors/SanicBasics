@@ -5,7 +5,6 @@ Created on May 17, 2020
 '''
 
 import asyncio
-
 from settingsManager import get_settings
 from sqlalchemy import create_engine
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
@@ -19,10 +18,10 @@ Base = declarative_base()
 
 class SessionManager:
 
-    connDict = {"memory": "sqlite://",
+    connDict = {"test": "sqlite://",
                 "local": f"sqlite:///{settingsManager.base_path}/local.db"}
 
-    asyncConnDict = {"memory": "sqlite+aiosqlite://",
+    asyncConnDict = {"test": "sqlite+aiosqlite://",
                      "local": f"sqlite+aiosqlite:///{settingsManager.base_path}/local.db"}
 
     def __init__(self):
@@ -93,10 +92,13 @@ def get_session(env=None, echo=False):
     return session_manager.get_session(env, echo=echo)
 
 
-def get_async_session(env="main", echo=False):
+def get_async_session(env=None, echo=False):
+    if not env:
+        from env import env as imported_env
+        env = imported_env
     return session_manager.get_async_session(env=env, echo=echo)
 
 
 if __name__ == "__main__":
 
-    session_manager.create_tables("memory")
+    session_manager.create_tables("test")

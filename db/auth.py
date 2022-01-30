@@ -16,7 +16,7 @@ from db.base import Base
 
 
 class User(Base):
-    
+
     characters = ascii_letters + digits
 
     __tablename__ = 'user'
@@ -28,6 +28,7 @@ class User(Base):
     new_email = Column(String)
     verify_code = Column(String)
     verified = Column(Boolean)
+    active = Column(Boolean, default=True)
     joined_on = Column(DateTime, default=datetime.date.today)
 
     ix_user_email = Index('ix_user_email', email)
@@ -106,9 +107,7 @@ class User(Base):
     async def authenticate(cls, session, ident, password):
 
         user = await cls.get_user(session, ident)
-
         if not user or user.password != password:
             return {"ok": False, "msg": "Username or password is incorrect"}
         else:
             return {"ok": True, "username": user.username, "uid": user.id, "admin": user.admin}
-

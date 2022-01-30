@@ -3,7 +3,9 @@ from base64 import b64decode, b64encode
 
 from cryptography.fernet import Fernet, InvalidToken
 
-from settingsManager import settingsManager
+from settingsManager import get_settings
+
+settingsManager = get_settings()
 
 
 class CSRF:

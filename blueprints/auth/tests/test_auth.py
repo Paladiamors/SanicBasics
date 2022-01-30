@@ -3,62 +3,54 @@ Created on May 17, 2020
 
 @author: justin
 '''
+from _env_test import env
+import asyncio
 import unittest
-
-from db import get_session
-from utils.auth import deleteUser, userExists
-from utils.testing import SanicRequests
-
-
-sanicRequests = SanicRequests()
+# from unittest import IsolatedAsyncioTestCase
+from db.base import get_async_session, session_manager
+from sanic_testing import TestManager
+from sanic_server import createApp
 
 
-class Test(unittest.TestCase):
+def get_app():
+    app = createApp()
+    return app
 
-    @unittest.skip("works")
-    def testCreateUser(self):
 
-        sanicRequests.newSession()
-        dSession = get_session()
+class TestSanicAuth(unittest.TestCase):
+
+    def setUp(self) -> None:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(session_manager.create_tables_async(env))
+
+    def test_create_user(self):
         username = "testUser"
         password = "12345"
-        userData = {"username": username, "password": password,
-                    "email": "email@test.com", "isStaff": True,
-                    "isActive": True, "verified": True}
+        userData = {"username": username,
+                    "password": password,
+                    "email": "email@test.com",
+                    "verified": True}
 
-        deleteUser(username)
-        response = sanicRequests.get("auth/createUser")
-        userData.update(response.json())
-        print(userData)
-        sanicRequests.post("auth/createUser", data=userData)
-        self.assertTrue(userExists(username, dSession), "user should exist")
-        dSession.close()
+        app = get_app()
+        _, response = app.test_client.post("auth/create_user", json=userData)
+        self.assertTrue(response.json["ok"])
 
-#     @unittest.skip("not testing")
+        _, response = app.test_client.post("auth/login", json=userData)
+        self.assertTrue("access_token" in response.json)
+
+        _, response = app.test_client.get("auth/login_check", cookies=response.cookies)
+        self.assertTrue(response.status_code == 200)
+
+        _, response = app.test_client.get("auth/login_check")
+        self.assertTrue(response.status_code == 401)
+
     def testAuth(self):
 
-        sanicRequests.newSession()
-        dSession = get_session()
-        username = "testUser"
-        password = "12345"
-        userData = {"username": username, "password": password,
-                    "email": "email@test.com", "isStaff": True,
-                    "isActive": True, "verified": True}
-
-        deleteUser(username, dSession=dSession)
-        token = sanicRequests.get("forms/token").json()
-        userData.update(token)
-        sanicRequests.post("auth/createUser", data=userData)
-
-        login = {"ident": "testUser", "password": "12345"}
-        login.update(token)
-        response = sanicRequests.post("auth/login", data=login)
-        print("logged in", response.cookies.get("authenticated"))
-        print("response", response.json())
+        pass
 
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']
 
-    unittest.main(exit=False)
-    sanicRequests.kill()
+    unittest.main()

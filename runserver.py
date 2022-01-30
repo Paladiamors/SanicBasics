@@ -7,7 +7,7 @@ Runs the server from the command line
 '''
 
 import argparse
-from sanicServer import runServer
+from sanic_server import runServer
 
 argparser = argparse.ArgumentParser(description="starts the app server")
 argparser.add_argument("--port", default=4000)

@@ -35,7 +35,7 @@ class SanicRequests:
         wait: time in seconds to wait after kicking off the sanic process
         settings: the name of the settings file to load
         """
-        
+
         base_path = settingsManager.base_path
 
         self.session = session or requests.Session()
@@ -66,9 +66,8 @@ class SanicRequests:
         stops the sanic server
         """
         self.proc.kill()
-        
+
     def newSession(self):
-        
         self.session = requests.Session()
 
 
