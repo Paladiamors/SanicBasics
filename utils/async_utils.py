@@ -17,14 +17,14 @@ import asyncio
 from functools import wraps
 
 
-def maybeasync(f):
+def maybe_async(f):
     """Decorator that allows a function to run as maybe async code"""
     loop = asyncio.get_event_loop()
 
     @wraps(f)
-    def wrap(*args):
+    def wrap(*args, **kwargs):
         if loop.is_running():
-            return loop.run_in_executor(None, f, *args)
+            return loop.run_in_executor(None, f, *args, **kwargs)
         else:
-            return f(*args)
+            return f(*args, **kwargs)
     return wrap

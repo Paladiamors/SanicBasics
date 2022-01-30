@@ -12,7 +12,7 @@ from wtforms import TextField, PasswordField
 from wtforms.validators import DataRequired
 from wtforms_sqlalchemy.orm import model_form
 
-from db.appTables import User
+from db.auth import User
 from utils.forms import Converter, FormSpec
 from wtforms.fields.core import Field
 

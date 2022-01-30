@@ -6,7 +6,7 @@ import docker
 
 from settingsManager import settingsManager
 
-port = settingsManager.getSetting("REDIS/PORT")
+port = settingsManager.get_setting("REDIS/PORT")
 
 client = docker.from_env()
 name = "redis_test"

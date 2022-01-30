@@ -5,22 +5,21 @@ Created on May 17, 2020
 '''
 
 import os
-from settingsManager import settingsManager
+from settingsManager import get_settings
 from subprocess import Popen
 from utils.networking import get_port
 import requests
 import time
 from urllib.parse import urljoin
 
-settings = "settings_test.json"
-settingsManager.loadSettings(settings)
-basePath = settingsManager.basePath
+settingsManager = get_settings("test")
+base_path = settingsManager.base_path
 
 
 def runSanicProcess():
 
-    pythonExec = os.path.join(basePath, "pybin/bin/python3")
-    runCommand = os.path.join(basePath, "runserver.py")
+    pythonExec = os.path.join(base_path, "pybin/bin/python3")
+    runCommand = os.path.join(base_path, "runserver.py")
     port = str(get_port())
 
     proc = Popen([pythonExec, runCommand, "--port", port, "--settings", settings])
@@ -37,12 +36,11 @@ class SanicRequests:
         settings: the name of the settings file to load
         """
         
-        settingsManager.loadSettings(settings)
-        basePath = settingsManager.basePath
+        base_path = settingsManager.base_path
 
         self.session = session or requests.Session()
-        pythonExec = os.path.join(basePath, "pybin/bin/python3")
-        runCommand = os.path.join(basePath, "runserver.py")
+        pythonExec = os.path.join(base_path, "pybin/bin/python3")
+        runCommand = os.path.join(base_path, "runserver.py")
         self.port = str(get_port())
         self.proc = Popen([pythonExec, runCommand, "--port", self.port, "--settings", settings])
         self.baseUrl = f"http://localhost:{self.port}"

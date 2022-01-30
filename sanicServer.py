@@ -41,7 +41,7 @@ blueprints = [
 def createApp():
 
     app = Sanic(name="main")
-    config = settingsManager.getSetting("REDIS_SESSION")
+    config = settingsManager.get_setting("REDIS_SESSION")
 
     Session(app, interface=RedisSessionInterface(redis.get_redis_pool_func(), **config))
 
@@ -55,9 +55,9 @@ def runServer(host=None, port=None, settings=None, auto_reload=None):
 
     if settings:
         settingsManager.loadSettings(settings)
-    # auto_reload = auto_reload if auto_reload is not None else settingsManager.getSetting("TESTING")
-    host = host or settingsManager.getSetting("HOST")
-    port = port or settingsManager.getSetting("PORT")
+    # auto_reload = auto_reload if auto_reload is not None else settingsManager.get_setting("TESTING")
+    host = host or settingsManager.get_setting("HOST")
+    port = port or settingsManager.get_setting("PORT")
     app = createApp()
     app.run(host=host, port=port, auto_reload=auto_reload)
 

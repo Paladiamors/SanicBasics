@@ -9,7 +9,7 @@
 
 import unittest
 from utils.auth import createUser, deleteUser, userExists
-from db import getSession
+from db import get_session
 
 env = "local"
 
@@ -18,7 +18,7 @@ class Test(unittest.TestCase):
 
     def testManageUser(self):
 
-        dSession = getSession(env)
+        dSession = get_session(env)
         username = "testUser"
         password = "12345"
         userData = {"username": username, "password": password,

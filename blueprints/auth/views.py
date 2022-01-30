@@ -8,8 +8,8 @@ from sanic.response import json
 
 from utils.auth import checkCredentials, logout as logout_, isAuthenticated
 from utils.redis import RedisStore
-from db.base import getSession
-from db.appTables import User
+from db.base import get_session
+from db.auth import User
 from utils.auth import createUser as createUser_
 from blueprints.auth.forms import UserForm, LoginForm
 
@@ -27,7 +27,7 @@ async def createUser(request):
 #         print("errors", form.errors)
 #         print("form", dir("form"))
 
-        dSession = getSession()
+        dSession = get_session()
 
         # Make this faster later
         unameResult = dSession.query(User.id).filter(User.username == form.data["username"]).scalar()

@@ -21,7 +21,7 @@ class CSRF:
         secret : binary, optional
             binary string representing the secret, by default None
         """
-        self.CSRF_SECRET = secret or settingsManager.getSetting("CSRF_SECRET").encode() or Fernet.generate_key()
+        self.CSRF_SECRET = secret or settingsManager.get_setting("CSRF_SECRET").encode() or Fernet.generate_key()
 
     def generate_csrf_token(self) -> str:
 

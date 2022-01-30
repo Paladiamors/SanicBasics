@@ -9,8 +9,9 @@ import uuid
 import asyncio_redis
 import ujson
 
-from settingsManager import settingsManager
+from settingsManager import get_settings
 
+settingsManager = get_settings()
 
 configs = settingsManager.settings
 

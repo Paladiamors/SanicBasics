@@ -8,8 +8,8 @@ tools for authentication
 from sanic.response import json
 from sqlalchemy.sql import or_
 
-from db.appTables import User
-from db.base import getSession
+from db.auth import User
+from db.base import get_session
 from db.utils import bulkInsert
 from utils.redis import RedisStore
 
@@ -22,7 +22,7 @@ def checkCredentials(username, password, dSession=None):
     was ok
     """
 
-    dSession = dSession or getSession()
+    dSession = dSession or get_session()
     user = dSession.query(User).filter(User.username == username).one_or_none()
     if user and user.password == password:
         return user.id
@@ -78,7 +78,7 @@ def createUser(data, dSession=None):
     """
     creates a user
     """
-    dSession = getSession(session=dSession)
+    dSession = get_session(session=dSession)
     bulkInsert(dSession, User, [data])
 
 
@@ -86,7 +86,7 @@ def deleteUser(info, dSession=None):
     """
     deletes a user
     """
-    dSession = getSession(session=dSession)
+    dSession = get_session(session=dSession)
     query = User.__table__.delete().where(or_(User.username == info,
                                               User.email == info))
     dSession.execute(query)
@@ -95,7 +95,7 @@ def deleteUser(info, dSession=None):
 
 def userExists(info, dSession=None):
 
-    dSession = getSession(session=dSession)
+    dSession = get_session(session=dSession)
     uid = dSession.query(User.id).filter(or_(User.username == info,
                                              User.email == info)).\
         scalar()

@@ -3,13 +3,9 @@ Created on May 17, 2020
 
 @author: justin
 '''
-import os
-import time
 import unittest
 
-from requests import Session
-
-from db import getSession
+from db import get_session
 from utils.auth import deleteUser, userExists
 from utils.testing import SanicRequests
 
@@ -23,7 +19,7 @@ class Test(unittest.TestCase):
     def testCreateUser(self):
 
         sanicRequests.newSession()
-        dSession = getSession()
+        dSession = get_session()
         username = "testUser"
         password = "12345"
         userData = {"username": username, "password": password,
@@ -42,7 +38,7 @@ class Test(unittest.TestCase):
     def testAuth(self):
 
         sanicRequests.newSession()
-        dSession = getSession()
+        dSession = get_session()
         username = "testUser"
         password = "12345"
         userData = {"username": username, "password": password,
@@ -62,7 +58,7 @@ class Test(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    #import sys;sys.argv = ['', 'Test.testName']
+    # import sys;sys.argv = ['', 'Test.testName']
 
     unittest.main(exit=False)
     sanicRequests.kill()

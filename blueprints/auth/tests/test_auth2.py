@@ -9,7 +9,7 @@ seems easier (however, this might be easier for debugging)
 '''
 import unittest
 
-from db import getSession
+from db import get_session
 from settingsManager import settingsManager
 from utils.auth import deleteUser, userExists
 from sanicServer import createApp
@@ -33,7 +33,7 @@ class Test(unittest.TestCase):
 
         deleteUser(username)
         request, response = app.test_client.post("/auth/createUser", data=userData)
-        dSession = getSession()
+        dSession = get_session()
         self.assertTrue(userExists(username, dSession), "user exist")
         dSession.close()
 
@@ -41,7 +41,7 @@ class Test(unittest.TestCase):
 #     def testAuth(self):
 # 
 #         session = Session()
-#         dSession = getSession()
+#         dSession = get_session()
 #         username = "testUser"
 #         password = "12345"
 #         userData = {"username": username, "password": password,
