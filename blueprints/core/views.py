@@ -1,6 +1,5 @@
 from sanic.response import json, text
 from sanic.blueprints import Blueprint
-from utils.auth import isAuthenticated
 from utils.csrf import CSRF
 
 bp = Blueprint("core", url_prefix="core/")
@@ -61,7 +60,6 @@ async def login(request):
 
 
 @bp.route("authenticated")
-@isAuthenticated
 async def profile(request):
     return json({"loggedin": True})
 

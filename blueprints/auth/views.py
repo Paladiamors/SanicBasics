@@ -3,6 +3,7 @@ Created on May 17, 2020
 
 @author: justin
 '''
+import datetime
 from sanic.blueprints import Blueprint
 from sanic.response import json
 from sanic.request import Request
@@ -34,8 +35,26 @@ async def create_user(request: Request):
 async def verify_user(request: Request):
     args = request.get_args()
     if "token" in args:
-        pass
-    return json({"ok": True})
+        e = EncryptJson()
+        resp = e.decrypt(args.get("token"))
+        if resp["expiry"] > datetime.datetime.utcnow().timestamp():
+            async with get_async_session() as session:
+                await User.verify_user(session, resp["email"])
+                return json({"ok": True})
+    return json({"ok": False})
+
+
+@bp.route("verify_new_email", methods=["GET"])
+async def verify_new_email(request: Request):
+    args = request.get_args()
+    if "token" in args:
+        e = EncryptJson()
+        resp = e.decrypt(args["token"])
+        if resp["expiry"] > datetime.datetime.utcnow().timestamp():
+            async with get_async_session() as session:
+                await User.update_email(session, resp["old_email"], resp["new_email"])
+                return json({"ok": True})
+    return json({"ok": False})
 
 
 @bp.route("verify_reset_password", methods=["GET"])

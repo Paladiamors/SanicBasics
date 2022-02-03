@@ -17,7 +17,6 @@ from db.base import get_async_session
 from db.auth import User
 from blueprints.core.views import bp as core
 from blueprints.auth.views import bp as auth
-from blueprints.forms.views import bp as forms
 from settingsManager import get_settings
 from utils.forms import parse_body
 
@@ -25,8 +24,7 @@ from utils.forms import parse_body
 settingsManager = get_settings()
 blueprints = [
     core,
-    auth,
-    forms
+    auth
 ]
 
 

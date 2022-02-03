@@ -27,7 +27,7 @@ class User(Base):
     last_password_reset = Column(DateTime)
     admin = Column(Boolean)
     new_email = Column(String)
-    verified = Column(Boolean)
+    verified = Column(Boolean, default=False)
     active = Column(Boolean, default=True)
     joined_on = Column(DateTime, default=datetime.date.today)
 
@@ -127,5 +127,14 @@ class User(Base):
             query = cls.__table__.update().\
                 where(cls.username == old_username).\
                 values(username=new_username)
+            await session.execute(query)
+            await session.commit()
+
+    @classmethod
+    async def verify_user(cls, session, email):
+        async with session.begin():
+            query = cls.__table__.update().\
+                where(cls.email == email).\
+                values(verified=True)
             await session.execute(query)
             await session.commit()
