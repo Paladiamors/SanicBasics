@@ -24,9 +24,9 @@ class User(Base):
     email = Column(String, unique=True)
     username = Column(String, unique=True)
     password = Column(PasswordType(schemes=['pbkdf2_sha512']))
+    last_password_reset = Column(DateTime)
     admin = Column(Boolean)
     new_email = Column(String)
-    verify_code = Column(String)
     verified = Column(Boolean)
     active = Column(Boolean, default=True)
     joined_on = Column(DateTime, default=datetime.date.today)
@@ -111,3 +111,21 @@ class User(Base):
             return {"ok": False, "msg": "Username or password is incorrect"}
         else:
             return {"ok": True, "username": user.username, "uid": user.id, "admin": user.admin}
+
+    @classmethod
+    async def update_email(cls, session, old_email, new_email):
+        async with session.begin():
+            query = cls.__table__.update().\
+                where(cls.email == old_email).\
+                values(email=new_email)
+            await session.execute(query)
+            await session.commit()
+
+    @classmethod
+    async def update_username(cls, session, old_username, new_username):
+        async with session.begin():
+            query = cls.__table__.update().\
+                where(cls.username == old_username).\
+                values(username=new_username)
+            await session.execute(query)
+            await session.commit()

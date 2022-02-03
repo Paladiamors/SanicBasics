@@ -3,12 +3,11 @@ Created on May 17, 2020
 
 @author: justin
 '''
-from _env_test import env
 import asyncio
 import unittest
-# from unittest import IsolatedAsyncioTestCase
+
+from _env_test import env
 from db.base import get_async_session, session_manager
-from sanic_testing import TestManager
 from sanic_server import createApp
 
 
@@ -44,10 +43,6 @@ class TestSanicAuth(unittest.TestCase):
 
         _, response = app.test_client.get("auth/login_check")
         self.assertTrue(response.status_code == 401)
-
-    def testAuth(self):
-
-        pass
 
 
 if __name__ == "__main__":

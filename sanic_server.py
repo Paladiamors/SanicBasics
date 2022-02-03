@@ -59,13 +59,13 @@ def createApp():
     return app
 
 
-def runServer(host=None, port=None, auto_reload=None):
+def runServer(host=None, port=None, auto_reload=None, motd=False):
 
     # auto_reload = auto_reload if auto_reload is not None else settingsManager.get_setting("TESTING")
     host = host or settingsManager.get_setting("HOST")
     port = port or settingsManager.get_setting("PORT")
     app = createApp()
-    app.run(host=host, port=port, auto_reload=auto_reload)
+    app.run(host=host, port=port, auto_reload=auto_reload, motd=motd)
 
 
 if __name__ == "__main__":
