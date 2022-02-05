@@ -1,5 +1,4 @@
 from utils.mail import mail
-from settingsManager import get_settings
 
 
 def stocknpv_mail():

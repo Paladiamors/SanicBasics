@@ -11,6 +11,7 @@
 # particular purpose.
 ###############################################################################
 
+from sqlalchemy import select
 from sanic import Sanic
 from sanic_jwt import Initialize, exceptions
 from db.base import get_async_session
@@ -39,35 +40,45 @@ async def authenticate(request):
             raise exceptions.AuthenticationFailed("Invalid credentials")
 
 
-def extend_payload(payload):
-    payload.update({"foo": "bar"})
+async def extend_payload(payload):
+
+    uid = payload.get("user_id")
+    query = select(User.username).where(User.id == uid)
+    async with get_async_session() as session:
+        async with session.begin():
+            cursor = await session.execute(query)
+            username = cursor.scalar()
+    payload.update({"username": username})
     return payload
 
 
 def createApp():
 
     app = Sanic(name="main")
+    config = settingsManager.get_setting("sanic/config", {})
+    app.config.update(config)
+
     Initialize(app,
                authenticate=authenticate,
                cookie_split=True,
                cookie_set=True,
                url_prefix="auth",
+               extend_payload=extend_payload,
                path_to_authenticate="/login",
                path_to_retrieve_user="/user",
                path_to_verify="/verify",
                path_to_refresh="/refresh")
     [app.blueprint(bp) for bp in blueprints]
-    app.config.update(settingsManager.settings)
     return app
 
 
-def runServer(host=None, port=None, auto_reload=None, motd=False):
+def runServer(**kwargs):
 
-    # auto_reload = auto_reload if auto_reload is not None else settingsManager.get_setting("TESTING")
-    host = host or settingsManager.get_setting("sanic/host")
-    port = port or settingsManager.get_setting("sanic/port")
+    settings = settingsManager.get_setting("sanic/run")
+    settings.update(kwargs)
+
     app = createApp()
-    app.run(host=host, port=port, auto_reload=auto_reload, motd=motd)
+    app.run(**settings)
 
 
 if __name__ == "__main__":

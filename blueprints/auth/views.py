@@ -5,7 +5,6 @@ Created on May 17, 2020
 '''
 import datetime
 
-from env import env
 from db.auth import User
 from db.base import get_async_session
 from sanic.blueprints import Blueprint
@@ -26,7 +25,6 @@ async def add_user(request: Request):
 
         async with get_async_session() as session:
             resp = await User.add_user(session, data)
-
         return json(resp)
 
     else:
@@ -66,10 +64,10 @@ async def verify_reset_password(request: Request):
 
 @bp.route("logout")
 async def logout(request: Request):
-    """
-    logs a user out
-    """
-    pass
+    response = json({"ok": True})
+    response.cookies.pop("access_token", None)
+    response.cookies.pop("access_token_signature", None)
+    return response
 
 
 @bp.route("login_check")

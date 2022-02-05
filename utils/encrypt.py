@@ -1,8 +1,13 @@
+import jwt
+from sanic.request import Request
 from cryptography.fernet import Fernet
 import json
 from json.decoder import JSONDecodeError
 from base64 import b64encode, b64decode
 import binascii
+from settingsManager import get_settings
+
+jwt_secret = get_settings().get_setting("sanic/config/SANIC_JWT_SECRET")
 
 
 class Encrypt:
@@ -35,3 +40,8 @@ class EncryptJson(Encrypt):
             return json.loads(super().decrypt(data))
         except (TypeError, JSONDecodeError):
             return None
+
+
+def decode_token(request: Request):
+    token = f'{request.cookies["access_token"]}.{request.cookies["access_token_signature"]}'
+    return jwt.decode(token, jwt_secret, algorithms=["HS256"])

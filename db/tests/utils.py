@@ -25,4 +25,4 @@ async def create_user():
                  "verified": True}
 
     async with get_async_session() as session:
-        User.add_user(session, user_data)
+        await User.add_user(session, user_data)
