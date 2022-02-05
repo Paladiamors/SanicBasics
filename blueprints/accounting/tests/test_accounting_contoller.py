@@ -63,7 +63,8 @@ class Test(aiounittest.AsyncTestCase):
                              'description': None,
                              'cost': Decimal('100.00'),
                              'comment': None}]
-        self.assertEqual(len(result), 2)
+
+        self.assertEqual(result, expected_results)
 
         result = await delete_record_(1, 1)
         self.assertTrue(result["ok"])

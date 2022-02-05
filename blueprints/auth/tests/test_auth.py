@@ -1,21 +1,26 @@
-'''
-Created on May 17, 2020
+###############################################################################
+# Copyright (C) 2022, created on February 05, 2022
+# Written by Justin Ho
+#
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
+#
+# This source code is distributed in the hope that it will be useful and
+# without warranty or implied warranty of merchantability or fitness for a
+# particular purpose.
+###############################################################################
 
-@author: justin
-'''
 import asyncio
 import datetime
 import unittest
 
 from _env_test import env
-from db.base import session_manager
+from db.base import get_async_session, session_manager
+from db.auth import User
+from sqlalchemy import select
 from sanic_server import createApp
 from utils.encrypt import EncryptJson
-
-
-def get_app():
-    app = createApp()
-    return app
 
 
 class TestSanicAuth(unittest.TestCase):
@@ -31,10 +36,10 @@ class TestSanicAuth(unittest.TestCase):
         userData = {"username": username,
                     "password": password,
                     "email": "email@test.com",
-                    "verified": True}
+                    "verified": False}
         server_kwargs = {"motd": False}
 
-        app = get_app()
+        app = createApp()
         _, response = app.test_client.post("auth/add_user", json=userData, server_kwargs=server_kwargs)
         self.assertTrue(response.json["ok"])
 
@@ -67,13 +72,13 @@ class TestSanicAuth(unittest.TestCase):
             "auth/verify_user", params={"token": token}, server_kwargs=server_kwargs)
         self.assertTrue(response.json["ok"])
 
-        # async def get_user():
-        #     async with get_async_session() as session:
-        #         query = select(User).filter(User.username == username)
-        #         resp = await session.execute(query)
-        #         user = resp.scalar()
-        #     self.assertTrue(user.verified)
-        # asyncio.run(get_user())
+        async def get_user():
+            async with get_async_session() as session:
+                query = select(User).filter(User.username == username)
+                resp = await session.execute(query)
+                user = resp.scalar()
+            self.assertTrue(user.verified)
+        asyncio.run(get_user())
 
 
 if __name__ == "__main__":

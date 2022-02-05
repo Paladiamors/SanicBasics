@@ -13,7 +13,7 @@
 
 import datetime
 from .base import Base
-from sqlalchemy import (Column, Date, Index, Integer, String, Numeric, ForeignKey, select)
+from sqlalchemy import (Column, Date, Index, Integer, String, Numeric, ForeignKey)
 
 
 class AccountingRecord(Base):

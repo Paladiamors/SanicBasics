@@ -25,14 +25,14 @@ from .controller import get_records as get_records_
 bp = Blueprint("accounting", url_prefix="accounting/")
 
 
-@bp.route("add_record")
+@bp.route("add_record", methods=["GET", "POST"])
 @protected()
-async def add_record(request: Request, method=["GET", "POST"]):
+async def add_record(request: Request):
     if request.method == "POST":
         token = decode_token(request)
         record = request.json
         record["user_id"] = token["user_id"]
-        result = add_record_(record)
+        result = await add_record_(record)
         return json(result)
     else:
         return json({"ok": False, "msg": "GET not allowed"})
@@ -46,14 +46,15 @@ async def get_records(request: Request):
     start_date = request.args.get("start_date", None)
     end_date = request.args.get("end_date", None)
     if start_date:
-        start_date = datetime.datetime.strptime(start_date, "%Y-%m-%d")
+        start_date = datetime.datetime.strptime(start_date, "%Y-%m-%d").date()
     if end_date:
-        end_date = datetime.datetime.strptime(end_date, "%Y-%m-%d")
+        end_date = datetime.datetime.strptime(end_date, "%Y-%m-%d").date()
 
-    return await get_records_(token["user_id"], start_date=start_date, end_date=end_date)
+    response = await get_records_(token["user_id"], start_date=start_date, end_date=end_date)
+    return json(response)
 
 
-@bp.route("delete_record")
+@bp.route("delete_record", methods=["GET", "POST"])
 @protected()
 async def delete_record(request: Request):
     token = decode_token(request)
@@ -62,7 +63,7 @@ async def delete_record(request: Request):
     return await delete_record_(token["user_id"], rid)
 
 
-@bp.route("delete_records")
+@bp.route("delete_records", methods=["GET", "POST"])
 @protected()
 async def delete_records(request: Request):
     token = decode_token(request)
