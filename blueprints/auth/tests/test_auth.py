@@ -27,7 +27,7 @@ class TestSanicAuth(unittest.TestCase):
         asyncio.set_event_loop(loop)
         loop.run_until_complete(session_manager.create_tables_async(env))
 
-    def test_create_user(self):
+    def test_add_user(self):
         username = "testUser"
         password = "12345"
         userData = {"username": username,
@@ -36,8 +36,12 @@ class TestSanicAuth(unittest.TestCase):
                     "verified": True}
 
         app = get_app()
-        _, response = app.test_client.post("auth/create_user", json=userData)
+        _, response = app.test_client.post("auth/add_user", json=userData)
         self.assertTrue(response.json["ok"])
+
+        # test authentication fail
+        _, response = app.test_client.post("auth/login", json={"email": "email@test.com", "password": "wrongPassword"})
+        self.assertTrue("access_token" not in response.json)
 
         _, response = app.test_client.post("auth/login", json=userData)
         self.assertTrue("access_token" in response.json)
@@ -50,7 +54,8 @@ class TestSanicAuth(unittest.TestCase):
 
         # perform validation of email address
         e = EncryptJson()
-        token = e.encrypt({"email": "email@test.com", "expiry": (datetime.datetime.utcnow() + datetime.timedelta(1)).timestamp()})
+        token = e.encrypt({"email": "email@test.com",
+                           "expiry": (datetime.datetime.utcnow() + datetime.timedelta(1)).timestamp()})
         _, response = app.test_client.get("auth/verify_user", params={"token": token})
         self.assertTrue(response.json["ok"])
 
@@ -60,6 +65,8 @@ class TestSanicAuth(unittest.TestCase):
                 resp = await session.execute(query)
                 user = resp.scalar()
             self.assertTrue(user.verified)
-        asyncio.run(get_user())        
+        asyncio.run(get_user())
+
+
 if __name__ == "__main__":
     unittest.main()

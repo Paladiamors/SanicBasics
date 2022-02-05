@@ -36,7 +36,7 @@ def bulkInsert(session, table, data):
     session.commit()
 
 
-def toDf(query, underbarAsSpace=False):
+def to_df(query, underbarAsSpace=False):
     """
     returns the data from the database as a dataframe
     """
@@ -54,7 +54,7 @@ def toDf(query, underbarAsSpace=False):
     return data
 
 
-def queryFilter(query, subquery, **kwargs):
+def query_filter(query, subquery, **kwargs):
     """
     does a filter on the query
 
@@ -78,7 +78,7 @@ def queryFilter(query, subquery, **kwargs):
     return query
 
 
-def removeDuplicates(dictList, uniqueColumns):
+def remove_duplicates(dictList, uniqueColumns):
     """
     dictList = list of dicts
     uniqueColumns = the columns the data is to be unique by

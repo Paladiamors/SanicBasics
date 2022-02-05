@@ -4,20 +4,22 @@ Created on May 17, 2020
 @author: justin
 '''
 import datetime
-from sanic.blueprints import Blueprint
-from sanic.response import json
-from sanic.request import Request
-from db.base import get_async_session
+
+from env import env
 from db.auth import User
+from db.base import get_async_session
+from sanic.blueprints import Blueprint
+from sanic.request import Request
+from sanic.response import json
 from sanic_jwt.decorators import protected
-from utils.forms import parse_body
 from utils.encrypt import EncryptJson
+from utils.forms import parse_body
 
 bp = Blueprint("auth", url_prefix="auth/")
 
 
-@bp.route("create_user", methods=["GET", "POST"])
-async def create_user(request: Request):
+@bp.route("add_user", methods=["GET", "POST"])
+async def add_user(request: Request):
 
     if request.method == "POST":
         data = parse_body(request)

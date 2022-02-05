@@ -39,6 +39,11 @@ async def authenticate(request):
             raise exceptions.AuthenticationFailed("Invalid credentials")
 
 
+def extend_payload(payload):
+    payload.update({"foo": "bar"})
+    return payload
+
+
 def createApp():
 
     app = Sanic(name="main")
@@ -50,8 +55,7 @@ def createApp():
                path_to_authenticate="/login",
                path_to_retrieve_user="/user",
                path_to_verify="/verify",
-               path_to_refresh="/refresh",
-               )
+               path_to_refresh="/refresh")
     [app.blueprint(bp) for bp in blueprints]
     app.config.update(settingsManager.settings)
     return app
@@ -60,8 +64,8 @@ def createApp():
 def runServer(host=None, port=None, auto_reload=None, motd=False):
 
     # auto_reload = auto_reload if auto_reload is not None else settingsManager.get_setting("TESTING")
-    host = host or settingsManager.get_setting("HOST")
-    port = port or settingsManager.get_setting("PORT")
+    host = host or settingsManager.get_setting("sanic/host")
+    port = port or settingsManager.get_setting("sanic/port")
     app = createApp()
     app.run(host=host, port=port, auto_reload=auto_reload, motd=motd)
 

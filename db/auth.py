@@ -5,7 +5,6 @@ Created on May 17, 2020
 '''
 
 import datetime
-from random import choice
 from string import ascii_letters, digits
 
 from sqlalchemy import (Boolean, Column, DateTime, Index, Integer, String,

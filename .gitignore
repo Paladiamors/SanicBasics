@@ -3,3 +3,5 @@
 .vscode
 pybin
 __pycache__
+env.py
+settings
