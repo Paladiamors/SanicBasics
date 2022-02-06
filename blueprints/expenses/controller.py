@@ -12,7 +12,7 @@
 ###############################################################################
 
 from sqlalchemy import select, and_, Date
-from db.accounting import AccountingRecord as Record
+from db.expenses import ExpenseRecord as Record
 from db.auth import User
 from db.base import get_async_session
 from db.utils import async_dictify

@@ -16,8 +16,8 @@ from .base import Base
 from sqlalchemy import (Column, Date, Index, Integer, String, Numeric, ForeignKey)
 
 
-class AccountingRecord(Base):
-    __tablename__ = 'accounting_record'
+class ExpenseRecord(Base):
+    __tablename__ = 'expense_record'
 
     id = Column(Integer, primary_key=True)
     date = Column(Date, default=datetime.date.today)
@@ -27,6 +27,6 @@ class AccountingRecord(Base):
     comment = Column(String)
 
     user_id = Column(ForeignKey('user.id'), nullable=False)
-    ix_accounting_record_user_id = Index('ix_accounting_record_user_id', user_id)
-    ix_accounting_record_date = Index('ix_accounting_record_date', date)
-    ix_accounting_record_type = Index('ix_accounting_record_type', type)
+    ix_expense_record_user_id = Index('ix_expense_record_user_id', user_id)
+    ix_expense_record_date = Index('ix_expense_record_date', date)
+    ix_expense_record_type = Index('ix_expense_record_type', type)

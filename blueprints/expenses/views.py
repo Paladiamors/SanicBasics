@@ -22,7 +22,7 @@ from .controller import delete_record as delete_record_
 from .controller import delete_records as delete_records_
 from .controller import get_records as get_records_
 
-bp = Blueprint("accounting", url_prefix="accounting/")
+bp = Blueprint("expenses", url_prefix="expenses/")
 
 
 @bp.route("add_record", methods=["GET", "POST"])

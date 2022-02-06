@@ -17,10 +17,10 @@ import unittest
 import aiounittest
 from _env_test import env
 from decimal import Decimal
-from blueprints.accounting.controller import add_record as add_record_
-from blueprints.accounting.controller import delete_record as delete_record_
-from blueprints.accounting.controller import delete_records as delete_records_
-from blueprints.accounting.controller import get_records as get_records_
+from blueprints.expenses.controller import add_record as add_record_
+from blueprints.expenses.controller import delete_record as delete_record_
+from blueprints.expenses.controller import delete_records as delete_records_
+from blueprints.expenses.controller import get_records as get_records_
 from db.base import get_async_session, session_manager
 from db.auth import User
 from sqlalchemy import select
@@ -52,13 +52,13 @@ class Test(aiounittest.AsyncTestCase):
 
         result = await get_records_(1)
         expected_results = [{'id': 1,
-                             'date': '2022-02-05',
+                             'date': datetime.date.today().isoformat(),
                              'type': None,
                              'description': None,
                              'cost': Decimal('100.00'),
                              'comment': None},
                             {'id': 2,
-                             'date': '2022-02-05',
+                             'date': datetime.date.today().isoformat(),
                              'type': None,
                              'description': None,
                              'cost': Decimal('100.00'),

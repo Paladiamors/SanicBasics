@@ -11,6 +11,7 @@
 # particular purpose.
 ###############################################################################
 import asyncio
+import datetime
 import unittest
 
 from _env_test import env
@@ -40,22 +41,22 @@ class Test(unittest.TestCase):
         cookies = response.cookies
 
         _, response = app.test_client.post(
-            "accounting/add_record", json={"cost": 100, "description": "test"}, cookies=cookies, server_kwargs=server_kwargs)
+            "expenses/add_record", json={"cost": 100, "description": "test"}, cookies=cookies, server_kwargs=server_kwargs)
         self.assertTrue(response.json["ok"])
 
         _, response = app.test_client.post(
-            "accounting/add_record", json={"cost": 101, "description": "test"}, cookies=cookies, server_kwargs=server_kwargs)
+            "expenses/add_record", json={"cost": 101, "description": "test"}, cookies=cookies, server_kwargs=server_kwargs)
         self.assertTrue(response.json["ok"])
 
-        _, response = app.test_client.get("accounting/get_records", cookies=cookies, server_kwargs=server_kwargs)
+        _, response = app.test_client.get("expenses/get_records", cookies=cookies, server_kwargs=server_kwargs)
         expected_response = [{'id': 1,
-                              'date': '2022-02-05',
+                              'date': datetime.date.today().isoformat(),
                               'type': None,
                               'description': 'test',
                               'cost': 100.0,
                               'comment': None},
                              {'id': 2,
-                              'date': '2022-02-05',
+                              'date': datetime.date.today().isoformat(),
                               'type': None,
                               'description': 'test',
                               'cost': 101.0,
