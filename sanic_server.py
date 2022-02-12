@@ -11,6 +11,8 @@
 # particular purpose.
 ###############################################################################
 
+import asyncio
+from db.base import session_manager
 from sanic import Sanic
 from sanic_jwt import Initialize, exceptions
 from sqlalchemy import select
@@ -73,7 +75,7 @@ def createApp():
                authenticate=authenticate,
                cookie_split=True,
                cookie_set=True,
-               url_prefix="auth",
+               url_prefix="api/auth",
                extend_payload=extend_payload,
                path_to_authenticate="/login",
                path_to_retrieve_user="/user",
@@ -91,7 +93,8 @@ def createApp():
 
 def runServer(**kwargs):
 
-    settings = settingsManager.get_setting("sanic/run")
+    print(settingsManager.get_base_path())
+    settings = settingsManager.get_setting("sanic/run", {})
     settings.update(kwargs)
 
     app = createApp()
@@ -100,4 +103,6 @@ def runServer(**kwargs):
 
 if __name__ == "__main__":
 
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(session_manager.create_tables_async(env))
     runServer(auto_reload=True)

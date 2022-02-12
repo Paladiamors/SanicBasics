@@ -40,25 +40,25 @@ class TestSanicAuth(unittest.TestCase):
         server_kwargs = {"motd": False, "auto_reload": False}
 
         app = createApp()
-        _, response = app.test_client.post("auth/add_user", json=userData, server_kwargs=server_kwargs, debug=True)
+        _, response = app.test_client.post("api/auth/add_user", json=userData, server_kwargs=server_kwargs, debug=True)
         self.assertTrue(response.json["ok"])
 
         # test authentication fail
         _, response = app.test_client.post(
-            "auth/login", json={"email": "email@test.com", "password": "wrongPassword"}, server_kwargs=server_kwargs, debug=True)
+            "api/auth/login", json={"email": "email@test.com", "password": "wrongPassword"}, server_kwargs=server_kwargs, debug=True)
         self.assertTrue("access_token" not in response.json)
 
-        _, response = app.test_client.post("auth/login", json=userData, server_kwargs=server_kwargs, debug=True)
+        _, response = app.test_client.post("api/auth/login", json=userData, server_kwargs=server_kwargs, debug=True)
         self.assertTrue("access_token" in response.json)
 
-        _, response = app.test_client.get("auth/login_check", cookies=response.cookies,
+        _, response = app.test_client.get("api/auth/login_check", cookies=response.cookies,
                                           server_kwargs=server_kwargs, debug=True)
         self.assertTrue(response.status_code == 200)
 
-        _, response = app.test_client.get("auth/login_check", server_kwargs=server_kwargs, debug=True)
+        _, response = app.test_client.get("api/auth/login_check", server_kwargs=server_kwargs, debug=True)
         self.assertTrue(response.status_code == 401)
 
-        _, response = app.test_client.get("auth/logout", cookies=response.cookies,
+        _, response = app.test_client.get("api/auth/logout", cookies=response.cookies,
                                           server_kwargs=server_kwargs, debug=True)
         self.assertTrue("access_token" not in response.cookies)
         self.assertTrue("access_token_signature" not in response.cookies)
@@ -69,7 +69,7 @@ class TestSanicAuth(unittest.TestCase):
         token = e.encrypt({"email": "email@test.com",
                            "expiry": (datetime.datetime.utcnow() + datetime.timedelta(1)).timestamp()})
         _, response = app.test_client.get(
-            "auth/verify_user", params={"token": token}, server_kwargs=server_kwargs, debug=True)
+            "api/auth/verify_user", params={"token": token}, server_kwargs=server_kwargs, debug=True)
         self.assertTrue(response.json["ok"])
 
         async def get_user():

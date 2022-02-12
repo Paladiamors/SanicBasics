@@ -2,7 +2,7 @@ from sanic.response import json, text
 from sanic.blueprints import Blueprint
 from utils.csrf import CSRF
 
-bp = Blueprint("core", url_prefix="core/")
+bp = Blueprint("core", url_prefix="api/core/")
 
 
 @bp.route("users")

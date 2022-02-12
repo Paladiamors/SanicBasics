@@ -14,7 +14,7 @@ from sanic_jwt.decorators import protected
 from utils.encrypt import EncryptJson
 from utils.forms import parse_body
 
-bp = Blueprint("auth", url_prefix="auth/")
+bp = Blueprint("auth", url_prefix="api/auth/")
 
 
 @bp.route("add_user", methods=["GET", "POST"])
