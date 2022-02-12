@@ -29,3 +29,13 @@ def parse_body(request):
         return json.loads(request.body.decode("utf-8"))
     else:
         return {}
+
+
+def parse_form_or_body(request):
+    """parses a form or body"""
+
+    if request.method == "POST":
+        if result := parse_form(request):
+            return result
+        else:
+            return parse_body(request)

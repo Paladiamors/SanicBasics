@@ -11,17 +11,20 @@
 # particular purpose.
 ###############################################################################
 
-from sqlalchemy import select
 from sanic import Sanic
 from sanic_jwt import Initialize, exceptions
-from db.base import get_async_session
-from db.auth import User
-from blueprints.core.views import bp as core
-from blueprints.auth.views import bp as auth
-from blueprints.expenses.views import bp as expenses
-from settingsManager import get_settings
-from utils.forms import parse_body
+from sqlalchemy import select
 
+from blueprints.auth.views import bp as auth
+from blueprints.core.views import bp as core
+from blueprints.expenses.views import bp as expenses
+from cors import add_cors_headers
+from db.auth import User
+from db.base import get_async_session
+from env import env
+from options import setup_options
+from settingsManager import get_settings
+from utils.forms import parse_body, parse_form
 
 settingsManager = get_settings()
 blueprints = [
@@ -32,7 +35,12 @@ blueprints = [
 
 
 async def authenticate(request):
-    data = parse_body(request)
+
+    # first try to parse a form, then parse the body
+    # to determine later how to handle posting
+    data = parse_form(request)
+    if not data:
+        data = parse_body(request)
     if "email" and "password" in data:
         async with get_async_session() as session:
             resp = await User.authenticate(session, data["email"], data["password"])
@@ -40,6 +48,7 @@ async def authenticate(request):
             return {"user_id": resp["uid"]}
         else:
             raise exceptions.AuthenticationFailed("Invalid credentials")
+    raise exceptions.AuthenticationFailed("Invalid credentials")
 
 
 async def extend_payload(payload):
@@ -71,6 +80,12 @@ def createApp():
                path_to_verify="/verify",
                path_to_refresh="/refresh")
     [app.blueprint(bp) for bp in blueprints]
+
+    if env in ("local", "test"):
+        # Add OPTIONS handlers to any route that is missing it
+        app.register_listener(setup_options, "before_server_start")
+        # Fill in CORS headers
+        app.register_middleware(add_cors_headers, "response")
     return app
 
 
