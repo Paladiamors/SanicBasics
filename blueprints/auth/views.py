@@ -12,7 +12,7 @@ from sanic.request import Request
 from sanic.response import json
 from sanic_jwt.decorators import protected
 from utils.encrypt import EncryptJson
-from utils.forms import parse_body
+from utils.forms import parse_form_or_body
 
 bp = Blueprint("auth", url_prefix="api/auth/")
 
@@ -21,7 +21,7 @@ bp = Blueprint("auth", url_prefix="api/auth/")
 async def add_user(request: Request):
 
     if request.method == "POST":
-        data = parse_body(request)
+        data = parse_form_or_body(request)
 
         async with get_async_session() as session:
             resp = await User.add_user(session, data)

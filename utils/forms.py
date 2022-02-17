@@ -26,7 +26,10 @@ def parse_body(request):
     """basic form parser"""
 
     if request.method == "POST":
-        return json.loads(request.body.decode("utf-8"))
+        try:
+            return json.loads(request.body.decode("utf-8"))
+        except json.decoder.JSONDecodeError:
+            return {}
     else:
         return {}
 
