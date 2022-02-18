@@ -17,18 +17,20 @@ from utils.forms import parse_body
 bp = Blueprint("auth", url_prefix="api/auth/")
 
 
-@bp.route("add_user", methods=["GET", "POST"])
+@bp.route("add_user", methods=("POST", ))
 async def add_user(request: Request):
 
-    if request.method == "POST":
-        data = parse_body(request)
+    data = parse_body(request)
 
-        async with get_async_session() as session:
-            resp = await User.add_user(session, data)
-        return json(resp)
+    async with get_async_session() as session:
+        resp = await User.add_user(session, data)
+    return json(resp)
 
-    else:
-        return json({"ok": False, "msg": "GET not supported"})
+
+
+@bp.route("delete_user", methods=("POST",))
+async def delete_user(request):
+    return json({"ok": True, "route": "delete_user"})
 
 
 @bp.route("verify_user", methods=["GET"])

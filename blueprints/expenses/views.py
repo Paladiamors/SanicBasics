@@ -25,17 +25,15 @@ from .controller import get_records as get_records_
 bp = Blueprint("expenses", url_prefix="api/expenses/")
 
 
-@bp.route("add_record", methods=["GET", "POST"])
+@bp.route("add_record", methods=["POST", ])
 @protected()
 async def add_record(request: Request):
-    if request.method == "POST":
-        token = decode_token(request)
-        record = request.json
-        record["user_id"] = token["user_id"]
-        result = await add_record_(record)
-        return json(result)
-    else:
-        return json({"ok": False, "msg": "GET not allowed"})
+
+    token = decode_token(request)
+    record = request.json
+    record["user_id"] = token["user_id"]
+    result = await add_record_(record)
+    return json(result)
 
 
 @bp.route("get_records")
@@ -54,7 +52,7 @@ async def get_records(request: Request):
     return json(response)
 
 
-@bp.route("delete_record", methods=["GET", "POST"])
+@bp.route("delete_record", methods=["POST", ])
 @protected()
 async def delete_record(request: Request):
     token = decode_token(request)
@@ -63,7 +61,7 @@ async def delete_record(request: Request):
     return await delete_record_(token["user_id"], rid)
 
 
-@bp.route("delete_records", methods=["GET", "POST"])
+@bp.route("delete_records", methods=["POST", ])
 @protected()
 async def delete_records(request: Request):
     token = decode_token(request)
