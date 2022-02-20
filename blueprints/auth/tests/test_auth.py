@@ -23,6 +23,9 @@ from sanic_server import createApp
 from utils.encrypt import EncryptJson
 
 
+server_kwargs = {"motd": False, "auto_reload": False}
+
+
 class TestSanicAuth(unittest.TestCase):
 
     def setUp(self) -> None:
@@ -37,7 +40,6 @@ class TestSanicAuth(unittest.TestCase):
                     "password": password,
                     "email": "email@test.com",
                     "verified": False}
-        server_kwargs = {"motd": False, "auto_reload": False}
 
         app = createApp()
         _, response = app.test_client.post("api/auth/add_user", json=userData, server_kwargs=server_kwargs, debug=True)
@@ -79,6 +81,16 @@ class TestSanicAuth(unittest.TestCase):
                 user = resp.scalar()
             self.assertTrue(user.verified)
         asyncio.run(get_user())
+
+        _, response = app.test_client.post("api/auth/delete_user",
+                                           json={"ident": username},
+                                           server_kwargs=server_kwargs, debug=True)
+        self.assertTrue(response.json["ok"])
+
+        _, response = app.test_client.post("api/auth/user_exists",
+                                           json={"ident": username},
+                                           server_kwargs=server_kwargs, debug=True)
+        self.assertFalse(response.json["exists"])
 
 
 if __name__ == "__main__":

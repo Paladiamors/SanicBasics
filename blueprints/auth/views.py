@@ -26,10 +26,13 @@ async def add_user(request: Request):
     return json(resp)
 
 
-
 @bp.route("delete_user", methods=("POST",))
 async def delete_user(request):
-    return json({"ok": True, "route": "delete_user"})
+    # TODO: use the user_id of the user from the token
+    data = parse_form_or_body(request)
+    async with get_async_session() as session:
+        resp = await User.delete_user(session, data["ident"])
+    return json(resp)
 
 
 @bp.route("verify_user", methods=["GET"])
@@ -71,7 +74,19 @@ async def logout(request: Request):
     return response
 
 
-@bp.route("login_check")
 @protected()
+@bp.route("login_check")
 async def loggedin(request: Request):
     return json({"ok": True, "msg": "you are logged in"})
+
+
+@bp.route("user_exists", methods=("POST",))
+async def user_exists(request):
+    data = parse_form_or_body(request)
+    ident = data.get("ident")
+    async with get_async_session() as session:
+        if '@' in ident:
+            exists = await User.email_exists(session, ident)
+        else:
+            exists = await User.username_exists(session, ident)
+    return json({"ok": True, "exists": exists})

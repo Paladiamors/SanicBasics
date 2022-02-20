@@ -34,21 +34,25 @@ class User(Base):
     ix_user_username = Index('ix_user_username', username)
 
     @classmethod
-    async def get_user(cls, session, email):
+    async def get_user(cls, session, ident):
         """returns the user object if it exists
         else None
 
         Parameters
         ----------
         session : sqlalcehmy.session
-        email : str
+        ident : str
             username or email
 
         returns True if ther user exists
         """
 
-        query = select(cls).\
-            filter(cls.email == email)
+        if '@' in ident:
+            query = select(cls).\
+                filter(cls.email == ident)
+        else:
+            query = select(cls).\
+                filter(cls.username == ident)
 
         cursor = await session.execute(query)
         return cursor.scalar()
