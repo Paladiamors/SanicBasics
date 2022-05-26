@@ -60,7 +60,7 @@ SQLAlchemy-Utils==0.38.2
 sscopes==0.2.0
 toml==0.10.2
 typing_extensions==4.0.1
-ujson==5.1.0
+ujson==5.2.0
 urllib3==1.26.8
 uvloop==0.16.0
 validators==0.18.2
